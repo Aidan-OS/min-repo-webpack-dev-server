@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 
-import SinglePage from './components/singlepage';
-
 import {
   HashRouter as Router,
   Route,
@@ -11,7 +9,11 @@ export default class extends Component {
 	render() {
 		return (
 			<Router>
-				<Route exact path="/" component={SinglePage} />
+				<Route exact path="/">
+					<div className="testdiv">
+						<h1>Webpack dev server debug</h1>
+					</div>
+				</Route>
 			</Router>
 		)
 	}

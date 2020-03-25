@@ -1,79 +1,70 @@
 const electron = require('electron');
-const { autoUpdater } = require('electron-updater');
-const {ipcMain} = electron;
-const { dialog } = electron;
-
 const BrowserWindow = electron.BrowserWindow;
+const app = electron.app;
 
 const url = require('url');
 const fs = require('fs');
 const os = require('os');
-const log = require('electron-log');
-
-console.log = log.info;
-console.warn = log.warn;
-console.error = log.error;
-log.catchErrors();
-
-const app = electron.app;
-const menu = electron.Menu
 const path = require('path');
 
-const eapp = electron.app; 
-const { JSONStorage } = require('node-localstorage');
+let mainWindow;
 
+function createWindow() {
+    if (process.platform === 'darwin') {
+        // Create our menu entries so that we can use MAC shortcuts
+        createMenu()
+    }
+    
+    mainWindow = new BrowserWindow({
+        width: 1124,
+        height: 768,
+        minWidth: 1124,
+        minHeight: 768,
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+            preload: path.join(__dirname, './res/sentry.js'),
+        }
+    });
 
-require(path.join(__dirname, './res/sentry.js'));
+    mainWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file:',
+        slashes: true,
+    }));
 
-if(!(process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test')) {
-    autoUpdater.autoDownload = false;
-    autoUpdater.on('error', (error) => {
-        dialog.showErrorBox('Error: ', error == null ? "unknown" : (error.stack || error).toString())
-    })
-    autoUpdater.logger = log;
-    autoUpdater.logger.transports.file.level = "info";
+    if(process.env.NODE_ENV === 'development') {
+    const {
+        default: installExtension,
+        REACT_DEVELOPER_TOOLS,
+        REDUX_DEVTOOLS
+    } = require('electron-devtools-installer');
+        // Open the DevTools.
+        mainWindow.webContents.openDevTools();
 
-    autoUpdater.on('update-available', () => {
+        installExtension(REACT_DEVELOPER_TOOLS)
+            .then((name) => console.log(`Added Extension:  ${name}`))
+            .catch((err) => console.log('An error occurred: ', err));
 
+        installExtension(REDUX_DEVTOOLS)
+            .then((name) => console.log(`Added Extension:  ${name}`))
+            .catch((err) => console.log('An error occurred: ', err));
 
-        dialog.showMessageBox({
-            type: 'info',
-            title: 'Found Updates',
-            message: 'An update to app is available. You will be prompted to restart the application when the update is ready to install.\nDownload now?',
-            buttons: ['Ok', 'Cancel']
-        }, (buttonIndex) => {
-            if (buttonIndex === 0) {
-    	        console.log('starting downloadUpdate');
-                autoUpdater.downloadUpdate()
-            }
-        })
-    })
-    autoUpdater.on('error', (ev, err) => {
-        console.log('autoupdateerror', ev, err);
-    })
-
-    autoUpdater.on('update-not-available', () => {
-        // dialog.showMessageBox({
-        //   title: 'No Updates',
-        //   message: 'Current version is up-to-date.'
-        // })
-    })
-
-    autoUpdater.on('update-downloaded', () => {
-        dialog.showMessageBox({
-            title: 'Install Updates',
-            message: 'Updates have been downloaded. Restart the application to apply the updates. Restart now?',
-            buttons: ['Ok', 'Cancel']
-        }, (buttonIndex) => {
-  	        if (buttonIndex === 0) {
-	            setImmediate(() =>
-                {
-                    console.log('starting quitAndInstall');
-                    autoUpdater.quitAndInstall()
-                })
-	        }
-        })
-    })
-    console.log('starting checkForUpdates');
-    autoUpdater.checkForUpdates();
+    }
 }
+
+
+app.on('ready', createWindow);
+
+
+app.on('activate', function() {
+  // On OS X it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (mainWindow === null) {
+        createWindow();
+  }
+});
+
+app.on('window-all-closed', () => {
+ app.quit();
+});
