@@ -1,6 +1,6 @@
 {
   "name": "basic-electron-project",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Minimum Reproducable Repo for Webpack-dev-server error",
   "main": "app.js",
   "repository": "no",
