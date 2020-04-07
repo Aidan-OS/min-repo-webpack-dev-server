@@ -10,8 +10,6 @@ module.exports = [{
 			'app': [
 				'@babel/polyfill',
 				'react-hot-loader/patch',
-				'webpack-dev-server/client?http://localhost:8080',
-				'webpack/hot/only-dev-server',
 				'./src/main/js/index.js',
 			],
 		},
@@ -44,9 +42,6 @@ module.exports = [{
 				}
 			],
 		},
-		resolve: {
-			mainFields: ['module', 'browser', 'main']
-		},
 		plugins: [
 			new webpack.HotModuleReplacementPlugin(),
 			new webpack.NamedModulesPlugin(),
@@ -64,8 +59,6 @@ module.exports = [{
 			'app': [
 				'react-hot-loader/patch',
 				'./src/main/index.html',
-				'webpack-dev-server/client?http://localhost:8080',
-				'webpack/hot/only-dev-server',
 			],
 		},
 		output: {
@@ -86,11 +79,7 @@ module.exports = [{
 					use: ['style-loader', 'css-loader']
 				}],
 		},
-		resolve: {
-			mainFields: ['browser', 'module']
-		},
 		plugins: [
-			new webpack.HotModuleReplacementPlugin(),
 			new CopyWebpackPlugin([
 				{
 					from: './src/main/index.html',
