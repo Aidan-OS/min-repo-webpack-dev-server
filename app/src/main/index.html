@@ -1,0 +1,16 @@
+<body>
+    <div id="root"></div>
+        <script>
+            {
+                const bundle = document.createElement('script');
+                const port = 8080;
+                bundle.src = 'http://localhost:' + port + '/app.bundle.js';
+                document.body.appendChild(bundle);
+                const devServer = document.createElement('script');
+                devServer.src = 'http://localhost:' + port + '/webpack-dev-server.js';
+                document.body.appendChild(devServer);
+            }
+        </script>
+        <script>if (typeof module === 'object') {window.module = module; module = undefined;}  </script>
+        <script>if (window.module) module = window.module; </script>
+</body>
